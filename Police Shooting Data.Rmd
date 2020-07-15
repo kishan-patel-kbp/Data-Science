@@ -1,0 +1,75 @@
+---
+title: "Police Shooting Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#reading in data
+data = read.csv(file = "fatal-police-shootings-data.csv", as.is = TRUE)
+head(data)
+```
+```{r}
+#data cleaning
+race <- gsub("B", "Black", data$race)
+race <- gsub("A", "Asian", race)
+race <- gsub("W", "White", race)
+race <- gsub("H", "Hispanic", race)
+race <- gsub("N", "Native A.", race)
+race <- gsub("O", "Other", race)
+
+data$race <- race
+#get data on population percentage of race from Census Bureau
+#https://www.census.gov/quickfacts/fact/table/US/PST045219
+
+amer_pop <- 329135084
+b_pop <- amer_pop * .134
+w_pop <- amer_pop * .601
+h_pop <- amer_pop * .185
+a_pop <- amer_pop * .059
+n_pop <- amer_pop * .013
+
+
+```
+
+```{r}
+
+hist(data$age, xlab = "Age", ylab = "Frequency", main = "Histogram of Those Fatally Shot by Age", col = "blue", breaks = 50)
+
+summary(na.omit(data$age))
+
+counts <- table(data$race)
+barplot(counts, xlab = "Race", ylab = "Count of Fatal Shootings", main = "Count of Fatal Shootings by Race")
+
+count_black <- nrow(data[data$race == "Black",])
+count_white <- nrow(data[data$race == "White",])
+count_hispanic <- nrow(data[data$race == "Hispanic",])
+count_asian <- nrow(data[data$race == "Asian",])
+count_na <- nrow(data[data$race == "Native A.",])
+
+
+black_per <- (count_black / b_pop) * 100
+white_per <- (count_white / w_pop) * 100
+hispanic_per <- (count_hispanic / h_pop) * 100
+asian_per <- (count_asian / a_pop) * 100
+na_per <- (count_na / n_pop) * 100
+
+fatalaties_per <- data.frame(c("Black", "White", "Hispanic", "Asian", "Native A."), c(black_per, white_per, hispanic_per, asian_per, na_per))
+
+barplot(c(black_per, white_per, hispanic_per, asian_per, na_per),
+main = "Fatal Shootings by Race as % of US Population",
+xlab = "Race",
+ylab = "Percentage",
+names.arg = c("Black", "White", "Hispanic", "Asian", "Native A."),
+col = "darkred")
+
+
+
+
+
+
+
+```
